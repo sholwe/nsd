@@ -1618,6 +1618,12 @@ query_add_optional(query_type *q, nsd_type *nsd)
 				/* nsid payload */
 				buffer_write(q->packet, nsd->nsid, nsd->nsid_len);
 			}
+			if(q->edns.error_report) {
+				buffer_write_u16(q->packet, ERROR_REPORT_CODE);
+				buffer_write_u16(q->packet, nsd->error_report_len);
+				buffer_write(q->packet, nsd->error_report
+				                      , nsd->error_report_len);
+			}
 		}
 		ARCOUNT_SET(q->packet, ARCOUNT(q->packet) + 1);
 		STATUP(nsd, edns);

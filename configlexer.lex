@@ -208,6 +208,7 @@ database{COLON}		{ LEXOUT(("v(%s) ", yytext)); return VAR_DATABASE;}
 identity{COLON}		{ LEXOUT(("v(%s) ", yytext)); return VAR_IDENTITY;}
 version{COLON}		{ LEXOUT(("v(%s) ", yytext)); return VAR_VERSION;}
 nsid{COLON}		{ LEXOUT(("v(%s) ", yytext)); return VAR_NSID;}
+error-reporting{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_ERROR_REPORT;}
 logfile{COLON}		{ LEXOUT(("v(%s) ", yytext)); return VAR_LOGFILE;}
 log-only-syslog{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_LOG_ONLY_SYSLOG;}
 server-count{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_SERVER_COUNT;}

@@ -18,6 +18,7 @@ struct query;
 #define OPT_RDATA 2                     /* holds the rdata length comes after OPT_LEN */
 #define OPT_HDR 4U                      /* NSID opt header length */
 #define NSID_CODE       3               /* nsid option code */
+#define ERROR_REPORT_CODE  0xE330       /* draft-arends-dns-error-reporting */
 #define DNSSEC_OK_MASK  0x8000U         /* do bit mask */
 
 struct edns_data
@@ -25,7 +26,6 @@ struct edns_data
 	char ok[OPT_LEN];
 	char error[OPT_LEN];
 	char rdata_none[OPT_RDATA];
-	char rdata_nsid[OPT_RDATA];
 	char nsid[OPT_HDR];
 };
 typedef struct edns_data edns_data_type;
@@ -47,6 +47,7 @@ struct edns_record
 	size_t		 opt_reserved_space;
 	int              dnssec_ok;
 	int              nsid;
+	int              error_report;
 };
 typedef struct edns_record edns_record_type;
 

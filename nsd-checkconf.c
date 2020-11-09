@@ -383,6 +383,7 @@ config_print_zone(nsd_options_type* opt, const char* k, int s, const char *o,
 		SERV_GET_STR(identity, o);
 		SERV_GET_STR(version, o);
 		SERV_GET_STR(nsid, o);
+		SERV_GET_STR(error_report, o);
 		SERV_GET_PATH(final, logfile, o);
 		SERV_GET_PATH(final, pidfile, o);
 		SERV_GET_STR(chroot, o);
@@ -521,6 +522,7 @@ config_test_print_server(nsd_options_type* opt)
 	print_string_var("identity:", opt->identity);
 	print_string_var("version:", opt->version);
 	print_string_var("nsid:", opt->nsid);
+	print_string_var("error-reporting:", opt->error_report);
 	print_string_var("logfile:", opt->logfile);
 	printf("\tlog-only-syslog: %s\n", opt->log_only_syslog?"yes":"no");
 	printf("\tserver-count: %d\n", opt->server_count);
