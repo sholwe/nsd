@@ -19,13 +19,14 @@ server:
 	#version:
 	nsid: "123456"
 	logfile: "/var/log/nsdlogfile.log"
+	log-only-syslog: no
 	server-count: 1
 	tcp-count: 100
 	tcp-query-count: 0
 	tcp-timeout: 120
 	tcp-mss: 0
 	outgoing-tcp-mss: 0
-	ipv4-edns-size: 4096
+	ipv4-edns-size: 1232
 	ipv6-edns-size: 1220
 	pidfile: "/var/pid/nsd.pid"
 	port: "53"
@@ -129,14 +130,15 @@ server:
 	#version:
 	#nsid:
 	logfile: "/var/log/nsdlogfile.log"
+	log-only-syslog: no
 	server-count: 1
 	tcp-count: 100
 	tcp-query-count: 0
 	tcp-timeout: 120
 	tcp-mss: 0
 	outgoing-tcp-mss: 0
-	ipv4-edns-size: 4096
-	ipv6-edns-size: 4096
+	ipv4-edns-size: 1232
+	ipv6-edns-size: 1232
 	pidfile: "/var/pid/nsd.pid"
 	port: "53"
 	statistics: 0
@@ -192,14 +194,15 @@ server:
 	#version:
 	#nsid:
 	#logfile:
+	log-only-syslog: no
 	server-count: 1
 	tcp-count: 100
 	tcp-query-count: 0
 	tcp-timeout: 120
 	tcp-mss: 0
 	outgoing-tcp-mss: 0
-	ipv4-edns-size: 4096
-	ipv6-edns-size: 4096
+	ipv4-edns-size: 1232
+	ipv6-edns-size: 1232
 	pidfile: "/var/run/nsd.pid"
 	port: "53"
 	statistics: 0
@@ -264,14 +267,15 @@ server:
 	#version:
 	#nsid:
 	#logfile:
+	log-only-syslog: no
 	server-count: 1
 	tcp-count: 100
 	tcp-query-count: 0
 	tcp-timeout: 120
 	tcp-mss: 0
 	outgoing-tcp-mss: 0
-	ipv4-edns-size: 4096
-	ipv6-edns-size: 4096
+	ipv4-edns-size: 1232
+	ipv6-edns-size: 1232
 	pidfile: "/var/run/nsd.pid"
 	port: "53"
 	statistics: 0
@@ -380,14 +384,15 @@ server:
 	#version:
 	#nsid:
 	#logfile:
+	log-only-syslog: no
 	server-count: 1
 	tcp-count: 100
 	tcp-query-count: 0
 	tcp-timeout: 120
 	tcp-mss: 0
 	outgoing-tcp-mss: 0
-	ipv4-edns-size: 4096
-	ipv6-edns-size: 4096
+	ipv4-edns-size: 1232
+	ipv6-edns-size: 1232
 	pidfile: "/var/run/nsd.pid"
 	port: "53"
 	statistics: 0

@@ -33,6 +33,7 @@ extern config_parser_state_type *cfg_parser;
 
 static void append_acl(struct acl_options **list, struct acl_options *acl);
 static int parse_boolean(const char *str, int *bln);
+static int parse_expire_expr(const char *str, long long *num, uint8_t *expr);
 static int parse_number(const char *str, long long *num);
 static int parse_range(const char *str, long long *low, long long *high);
 
@@ -171,6 +172,7 @@ struct component {
 %token VAR_MIN_REFRESH_TIME
 %token VAR_MAX_RETRY_TIME
 %token VAR_MIN_RETRY_TIME
+%token VAR_MIN_EXPIRE_TIME
 %token VAR_MULTI_MASTER_CHECK
 %token VAR_SIZE_LIMIT_XFR
 %token VAR_ZONESTATS
@@ -878,6 +880,18 @@ pattern_or_zone_option:
     {
       cfg_parser->pattern->min_retry_time = $2;
       cfg_parser->pattern->min_retry_time_is_default = 0;
+    } 
+  | VAR_MIN_EXPIRE_TIME STRING
+    {
+      long long num;
+      uint8_t expr;
+
+      if (!parse_expire_expr($2, &num, &expr)) {
+        yyerror("expected an expire time in seconds or \"refresh+retry+1\"");
+        YYABORT; /* trigger a parser error */
+      }
+      cfg_parser->pattern->min_expire_time = num;
+      cfg_parser->pattern->min_expire_time_expr = expr;
     }
   | VAR_VERIFY_ZONE boolean
     { cfg_parser->pattern->verify_zone = $2; }
@@ -1021,6 +1035,21 @@ parse_boolean(const char *str, int *bln)
 	}
 
 	return 1;
+}
+
+static int
+parse_expire_expr(const char *str, long long *num, uint8_t *expr)
+{
+	if(parse_number(str, num)) {
+		*expr = EXPIRE_TIME_HAS_VALUE;
+		return 1;
+	}
+	if(strcmp(str, REFRESHPLUSRETRYPLUS1_STR) == 0) {
+		*num = 0;
+		*expr = REFRESHPLUSRETRYPLUS1;
+		return 1;
+	}
+	return 0;
 }
 
 static int

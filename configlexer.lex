@@ -40,16 +40,6 @@ struct inc_state {
 };
 static struct inc_state* config_include_stack = NULL;
 static int inc_depth = 0;
-static int inc_prev = 0;
-static int num_args = 0;
-
-void init_cfg_parse(void)
-{
-	config_include_stack = NULL;
-	inc_depth = 0;
-	inc_prev = 0;
-	num_args = 0;
-}
 
 static void config_start_include(const char* filename)
 {
@@ -295,6 +285,7 @@ max-refresh-time{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MAX_REFRESH_TIM
 min-refresh-time{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MIN_REFRESH_TIME;}
 max-retry-time{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MAX_RETRY_TIME;}
 min-retry-time{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MIN_RETRY_TIME;}
+min-expire-time{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MIN_EXPIRE_TIME;}
 multi-master-check{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_MULTI_MASTER_CHECK;}
 tls-service-key{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_TLS_SERVICE_KEY;}
 tls-service-ocsp{COLON}	{ LEXOUT(("v(%s) ", yytext)); return VAR_TLS_SERVICE_OCSP;}

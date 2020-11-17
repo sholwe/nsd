@@ -10,7 +10,6 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include "config.h"
 #include <stdarg.h>
 #include "region-allocator.h"
 #include "rbtree.h"
@@ -214,6 +213,17 @@ struct cpu_map_option {
 };
 
 /*
+ * Defines for min_expire_time_expr value
+ */
+#define EXPIRE_TIME_HAS_VALUE     0
+#define EXPIRE_TIME_IS_DEFAULT    1
+#define REFRESHPLUSRETRYPLUS1     2
+#define REFRESHPLUSRETRYPLUS1_STR "refresh+retry+1"
+#define expire_time_is_default(x) (!(  (x) == REFRESHPLUSRETRYPLUS1 \
+                                    || (x) == EXPIRE_TIME_HAS_VALUE ))
+
+
+/*
  * Pattern of zone options, used to contain options for zone(s).
  */
 struct pattern_options {
@@ -243,6 +253,12 @@ struct pattern_options {
 	uint8_t max_retry_time_is_default;
 	uint32_t min_retry_time;
 	uint8_t min_retry_time_is_default;
+	uint32_t min_expire_time;
+	/* min_expir_time_expr is either a known value (REFRESHPLUSRETRYPLUS1
+	 * or EXPIRE_EXPR_HAS_VALUE) or else min_expire_time is the default.
+	 * This can be tested with expire_time_is_default(x) define.
+	 */
+	uint8_t min_expire_time_expr;
 	uint64_t size_limit_xfr;
 	uint8_t multi_master_check;
 	uint8_t verify_zone;
@@ -479,5 +495,9 @@ void nsd_options_destroy(struct nsd_options* opt);
 void replace_str(char* buf, size_t len, const char* one, const char* two);
 /* apply pattern to the existing pattern in the parser */
 void config_apply_pattern(struct pattern_options *dest, const char* name);
+/* if the file is a directory, print a warning, because flex just exit()s
+ * when a fileread fails because it is a directory, helps the user figure
+ * out what just happened */
+void warn_if_directory(const char* filetype, FILE* f, const char* fname);
 
 #endif /* OPTIONS_H */

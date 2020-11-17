@@ -9,6 +9,7 @@
 #include "config.h"
 #include <string.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include "options.h"
 #include "query.h"
@@ -171,6 +172,20 @@ nsd_options_insert_pattern(struct nsd_options* opt,
 	return 1;
 }
 
+void
+warn_if_directory(const char* filetype, FILE* f, const char* fname)
+{
+	if(fileno(f) != -1) {
+		struct stat st;
+		memset(&st, 0, sizeof(st));
+		if(fstat(fileno(f), &st) != -1) {
+			if(S_ISDIR(st.st_mode)) {
+				log_msg(LOG_WARNING, "trying to read %s but it is a directory: %s", filetype, fname);
+			}
+		}
+	}
+}
+
 int
 parse_options_file(struct nsd_options* opt, const char* file,
 	void (*err)(void*,const char*), void* err_arg)
@@ -207,6 +222,7 @@ parse_options_file(struct nsd_options* opt, const char* file,
 		}
 		return 0;
 	}
+	warn_if_directory("configfile", in, file);
 	c_in = in;
 	c_parse();
 	fclose(in);
@@ -765,6 +781,16 @@ zone_options_create(region_type* region)
 /* true is booleans are the same truth value */
 #define booleq(x,y) ( ((x) && (y)) || (!(x) && !(y)) )
 
+/* true is min_expire_time_expr has either an equal known value
+ * or none of these known values but booleanally equal
+ */
+#define expire_expr_eq(x,y) (  (  (x) == REFRESHPLUSRETRYPLUS1 \
+                               && (y) == REFRESHPLUSRETRYPLUS1 ) \
+                            || (  (x) != REFRESHPLUSRETRYPLUS1 \
+                               && (y) != REFRESHPLUSRETRYPLUS1 \
+                               && booleq((x), (y))))
+
+
 int
 acl_equal(struct acl_options* p, struct acl_options* q)
 {
@@ -827,6 +853,8 @@ pattern_options_create(region_type* region)
 	p->max_retry_time_is_default = 1;
 	p->min_retry_time = 0;
 	p->min_retry_time_is_default = 1;
+	p->min_expire_time = 0;
+	p->min_expire_time_expr = EXPIRE_TIME_IS_DEFAULT;
 #ifdef RATELIMIT
 	p->rrl_whitelist = 0;
 #endif
@@ -1010,6 +1038,8 @@ copy_pat_fixed(region_type* region, struct pattern_options* orig,
 	orig->max_retry_time_is_default = p->max_retry_time_is_default;
 	orig->min_retry_time = p->min_retry_time;
 	orig->min_retry_time_is_default = p->min_retry_time_is_default;
+	orig->min_expire_time = p->min_expire_time;
+	orig->min_expire_time_expr = p->min_expire_time_expr;
 #ifdef RATELIMIT
 	orig->rrl_whitelist = p->rrl_whitelist;
 #endif
@@ -1124,6 +1154,9 @@ pattern_options_equal(struct pattern_options* p, struct pattern_options* q)
 	if(p->min_retry_time != q->min_retry_time) return 0;
 	if(!booleq(p->min_retry_time_is_default,
 		q->min_retry_time_is_default)) return 0;
+	if(p->min_expire_time != q->min_expire_time) return 0;
+	if(!expire_expr_eq(p->min_expire_time_expr,
+		q->min_expire_time_expr)) return 0;
 #ifdef RATELIMIT
 	if(p->rrl_whitelist != q->rrl_whitelist) return 0;
 #endif
@@ -1342,6 +1375,8 @@ pattern_options_marshal(struct buffer* b, struct pattern_options* p)
 	marshal_u8(b, p->max_retry_time_is_default);
 	marshal_u32(b, p->min_retry_time);
 	marshal_u8(b, p->min_retry_time_is_default);
+	marshal_u32(b, p->min_expire_time);
+	marshal_u8(b, p->min_expire_time_expr);
 	marshal_u8(b, p->multi_master_check);
 	marshal_u8(b, p->verify_zone);
 	marshal_u8(b, p->verify_zone_is_default);
@@ -1381,6 +1416,8 @@ pattern_options_unmarshal(region_type* r, struct buffer* b)
 	p->max_retry_time_is_default = unmarshal_u8(b);
 	p->min_retry_time = unmarshal_u32(b);
 	p->min_retry_time_is_default = unmarshal_u8(b);
+	p->min_expire_time = unmarshal_u32(b);
+	p->min_expire_time_expr = unmarshal_u8(b);
 	p->multi_master_check = unmarshal_u8(b);
 	p->verify_zone = unmarshal_u8(b);
 	p->verify_zone_is_default = unmarshal_u8(b);
@@ -2157,6 +2194,10 @@ config_apply_pattern(struct pattern_options *dest, const char* name)
 	if(!pat->min_retry_time_is_default) {
 		dest->min_retry_time = pat->min_retry_time;
 		dest->min_retry_time_is_default = 0;
+	}
+	if(!expire_time_is_default(pat->min_expire_time_expr)) {
+		dest->min_expire_time = pat->min_expire_time;
+		dest->min_expire_time_expr = pat->min_expire_time_expr;
 	}
 	dest->size_limit_xfr = pat->size_limit_xfr;
 #ifdef RATELIMIT
