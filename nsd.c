@@ -1025,6 +1025,7 @@ main(int argc, char *argv[])
 	nsd.chrootdir	= 0;
 	nsd.nsid 	= NULL;
 	nsd.nsid_len 	= 0;
+	nsd.error_report_len 	= 0;
 
 	nsd.child_count = 0;
 	nsd.maximum_tcp_count = 0;
@@ -1321,6 +1322,14 @@ main(int argc, char *argv[])
 		if (hex_pton(nsd.options->nsid, nsd.nsid, nsd.nsid_len) == -1) {
 			error("hex string cannot be parsed '%s' in NSID.", nsd.options->nsid);
 		}
+	}
+	if (nsd.error_report_len == 0 && nsd.options->error_report) {
+		nsd.error_report_len = dname_parse_wire(nsd.error_report, nsd.options->error_report);
+		if (nsd.error_report_len == 0) {
+			error("error-reporting '%s' must be a domain name", nsd.options->error_report);
+		}
+		/* fqdn */
+		nsd.error_report[nsd.error_report_len++] = 0;
 	}
 	edns_init_nsid(&nsd.edns_ipv4, nsd.nsid_len);
 #if defined(INET6)

@@ -97,6 +97,7 @@ struct component {
 %token VAR_VERSION
 %token VAR_IDENTITY
 %token VAR_NSID
+%token VAR_ERROR_REPORT
 %token VAR_TCP_COUNT
 %token VAR_TCP_REJECT_OVERFLOW
 %token VAR_TCP_QUERY_COUNT
@@ -311,6 +312,18 @@ server_option:
         } else {
           yyerror("NSID too long");
         }
+      }
+    }
+  | VAR_ERROR_REPORT STRING
+    {
+      dname_type *dname;
+
+      dname = (dname_type *)dname_parse(cfg_parser->opt->region, $2);
+      cfg_parser->opt->error_report = region_strdup(cfg_parser->opt->region, $2);
+      if(dname == NULL) {
+        yyerror("bad error-reporting name %s", $2);
+      } else {
+        region_recycle(cfg_parser->opt->region, dname, dname_total_size(dname));
       }
     }
   | VAR_LOGFILE STRING

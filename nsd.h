@@ -246,6 +246,8 @@ struct	nsd
 	const char		*identity;
 	uint16_t		nsid_len;
 	unsigned char		*nsid;
+	uint16_t		error_report_len;
+	uint8_t			error_report[MAXDOMAINLEN + 1];
 	uint8_t 		file_rotation_ok;
 
 #ifdef HAVE_CPUSET_T

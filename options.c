@@ -66,6 +66,7 @@ nsd_options_create(region_type* region)
 	opt->identity = 0;
 	opt->version = 0;
 	opt->nsid = 0;
+	opt->error_report = 0;
 	opt->logfile = 0;
 	opt->log_only_syslog = 0;
 	opt->log_time_ascii = 1;

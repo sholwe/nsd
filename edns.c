@@ -38,10 +38,6 @@ edns_init_data(edns_data_type *data, uint16_t max_length)
 void
 edns_init_nsid(edns_data_type *data, uint16_t nsid_len)
 {
-       /* add nsid length bytes */
-       data->rdata_nsid[0] = ((OPT_HDR + nsid_len) & 0xff00) >> 8; /* length_hi */
-       data->rdata_nsid[1] = ((OPT_HDR + nsid_len) & 0x00ff);      /* length_lo */
-
        /* NSID OPT HDR */
        data->nsid[0] = (NSID_CODE & 0xff00) >> 8;
        data->nsid[1] = (NSID_CODE & 0x00ff);
@@ -81,6 +77,17 @@ edns_handle_option(uint16_t optcode, uint16_t optlen, buffer_type* packet,
 			buffer_skip(packet, optlen);
 		}
 		break;
+	case ERROR_REPORT_CODE:
+		if (nsd->error_report_len > 0) {
+			edns->error_report = 1;
+			/* we have to check optlen, and move the buffer along */
+			buffer_skip(packet, optlen);
+			/* in the reply we need space for optcode+optlen+nsid_bytes */
+			edns->opt_reserved_space += OPT_HDR + nsd->error_report_len;
+		} else {
+			/* ignore option */
+			buffer_skip(packet, optlen);
+		}
 	default:
 		buffer_skip(packet, optlen);
 		break;
