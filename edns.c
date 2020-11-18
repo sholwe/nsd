@@ -88,6 +88,7 @@ edns_handle_option(uint16_t optcode, uint16_t optlen, buffer_type* packet,
 			/* ignore option */
 			buffer_skip(packet, optlen);
 		}
+		break;
 	default:
 		buffer_skip(packet, optlen);
 		break;

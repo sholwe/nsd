@@ -1325,6 +1325,7 @@ xfrd_handle_incoming_soa(xfrd_zone_type* zone,
 				  xfrd_time() > zone->soa_disk_acquired
 				? xfrd_time() - zone->soa_disk_acquired : 0;
 			if(seconds_since_acquired < bound_soa_disk_refresh(zone))
+			{
 				zone->round_num = -1;
 				xfrd_set_timer_refresh(zone);
 			} else if(seconds_since_acquired < bound_soa_disk_expire(zone))
